@@ -1,7 +1,7 @@
 # RandomSounds
 
 Lethal Company mod that lets you add custom sounds to the game.
-All of the sounds of a specific audio are played synchronously between the players (if they have the mod too and the same custom audios).
+All of the sounds of a specific audio are randomly choosen and played synchronously between the players (if they have the mod too and the same custom audios).
 
 ## Install
 
