@@ -10,7 +10,7 @@ All of the sounds of a specific audio are played synchronously between the playe
 OR
 
 1. Make sure you have [BepInEx](https://thunderstore.io/c/lethal-company/p/BepInEx/BepInExPack/) & [LCSoundTool](https://thunderstore.io/c/lethal-company/p/no00ob/LCSoundTool/) installed.
-2. Unzip the folder `RandomSounds` into `...\Lethal Company\BepInEx\plugins`.
+2. Move `RandomSounds.dll` and `RandomSounds` into `...\Lethal Company\BepInEx\plugins`.
 
 ## Add sounds
 
