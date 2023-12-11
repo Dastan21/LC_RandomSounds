@@ -1,0 +1,10 @@
+<Project>
+    <PropertyGroup>
+        <GameDir>PATH_TO_GAME_FOLDER</GameDir>
+    </PropertyGroup>
+
+	<!-- Optional, copy mod to game plugins folder -->
+	<Target Name="ApplyModLoader" AfterTargets="PostBuildEvent" Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+		<Copy SourceFiles="$(TargetPath)" DestinationFiles="$(GameDir)\BepInEx\plugins\$(TargetFileName)" />
+	</Target>
+</Project>
