@@ -15,9 +15,34 @@ OR
 ## Add sounds
 
 You must create a folder named after the audio you want to add sounds to.
-Then add your .wav files in the folder.
+Then add your audio files in the folder.
 
-Example: `...\plugins\RandomSounds\ClownHorn1\Clown.wav`
+Example: `...\plugins\RandomSounds\ClownHorn1\Clown.mp3`
+
+## Edit weights
+
+You can customize the weight of each sound.
+Create a file `weights.json` in on of the audio folder and set the weights you want.
+
+For example, if you have 2 custom sounds `AirHorn1\Funny1.mp3` & `AirHorn1\Funny1.mp3`.
+
+Here is an example of `weights.json`:
+```json
+[
+	{
+		"sound": "Funny1",
+		"weight": 5,
+	},
+	{
+		"sound": "Funny2",
+		"weight": 2,
+	},
+	{
+		"sound": "original", // reserved word for the original sound
+		"weight": 0, // 0 or negative number to disable the sound
+	}
+]
+```
 
 ## Tip
-You can use [LCSoundTool](https://thunderstore.io/c/lethal-company/p/no00ob/LCSoundTool/) and its F5 logging feature to identify the name of the prop audio you want to replace.
+You can use [LCSoundTool](https://thunderstore.io/c/lethal-company/p/no00ob/LCSoundTool/) and its F5 logging feature to identify the name of the audio you want to replace.

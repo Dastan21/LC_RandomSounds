@@ -22,12 +22,22 @@ namespace RandomSounds.Patches
 
             if (!RandomSounds.ReplacedClips.ContainsKey(clipName)) return original;
 
-            AudioClip[] clips = RandomSounds.ReplacedClips[clipName].ToArray();
-            int index = RandomSounds.random.Next(0, clips.Length + 1);
-            if (index == clips.Length) return original;
+            ClipWeight[] clips = RandomSounds.ReplacedClips[clipName].ToArray();
+            int totalWeight = clips.Aggregate(0, (t, sw) => t + sw.weight);
 
-            RandomSounds.Instance.logger.LogInfo($"Playing custom sound {clips[index].GetName()} instead of {clipName}");
-            return clips[index];
+            AudioClip clip = null;
+            int rng = RandomSounds.random.Next(0, totalWeight);
+            RandomSounds.SeedOffset++;
+            for (int i = 0; i < clips.Length + 1; i++)
+            {
+                clip = clips[i].clip;
+                if (rng < clips[i].weight) break;
+                rng -= clips[i].weight;
+            }
+            if (clip == null) return original;
+
+            RandomSounds.Instance.logger.LogInfo($"Playing custom sound {clip.GetName()} instead of {clipName}");
+            return clip;
         }
     }
 }

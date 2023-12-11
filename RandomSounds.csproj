@@ -31,6 +31,9 @@
 		<Reference Include="LC_API">
 		  <HintPath>$(GameDir)\BepInEx\plugins\LC_API.dll</HintPath>
 		</Reference>
+		<Reference Include="Newtonsoft.Json">
+		  <HintPath>$(GameDir)\Lethal Company_Data\Managed\Newtonsoft.Json.dll</HintPath>
+		</Reference>
 		<Reference Include="Unity.Netcode.Runtime">
 			<HintPath>$(GameDir)\Lethal Company_Data\Managed\Unity.Netcode.Runtime.dll</HintPath>
 		</Reference>
