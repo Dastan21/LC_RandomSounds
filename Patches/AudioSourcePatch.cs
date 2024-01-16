@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using System;
 using System.Linq;
 using UnityEngine;
 
@@ -7,6 +8,34 @@ namespace RandomSounds.Patches
     [HarmonyPatch(typeof(AudioSource))]
     internal class AudioSourcePatch
     {
+        [HarmonyPatch(nameof(AudioSource.Play), new Type[] { })]
+        [HarmonyPrefix]
+        public static void Play_Patch(AudioSource __instance)
+        {
+            __instance.clip = ReplaceClipWithNew(__instance.clip);
+        }
+
+        [HarmonyPatch(nameof(AudioSource.Play), new[] { typeof(ulong) })]
+        [HarmonyPrefix]
+        public static void Play_UlongPatch(AudioSource __instance)
+        {
+            __instance.clip = ReplaceClipWithNew(__instance.clip);
+        }
+
+        [HarmonyPatch(nameof(AudioSource.Play), new[] { typeof(double) })]
+        [HarmonyPrefix]
+        public static void Play_DoublePatch(AudioSource __instance)
+        {
+            __instance.clip = ReplaceClipWithNew(__instance.clip);
+        }
+
+        [HarmonyPatch(nameof(AudioSource.PlayDelayed), new[] { typeof(float) })]
+        [HarmonyPrefix]
+        public static void PlayDelayed_Patch(AudioSource __instance)
+        {
+            __instance.clip = ReplaceClipWithNew(__instance.clip);
+        }
+
         [HarmonyPatch(nameof(AudioSource.PlayOneShotHelper), new[] { typeof(AudioSource), typeof(AudioClip), typeof(float) })]
         [HarmonyPrefix]
         public static void PlayOneShotHelper_Patch(AudioSource source, ref AudioClip clip, float volumeScale)
