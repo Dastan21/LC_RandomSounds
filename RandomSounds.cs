@@ -17,21 +17,21 @@ namespace RandomSounds
         public const string RandomSoundsDir = "RandomSounds";
         public const string SeedRPCSignature = "RCPS_SeedSync";
         public const string OriginalKey = "original";
-        public static readonly string[] AllowedExtensions = { ".wav", ".mp3", ".ogg" };
+        public static readonly string[] AllowedExtensions = [".wav", ".mp3", ".ogg"];
 
-        public static RandomSounds Instance;
+        public static RandomSounds Instance { get; private set; }
         public static int Seed = new System.Random().Next();
         public static int SeedOffset = 0;
-        public static System.Random random = new System.Random(Seed);
+        public static System.Random random = new(Seed);
 
         internal ManualLogSource logger;
 
-        public Dictionary<string, string> soundPacks = new Dictionary<string, string>();
-        public static Dictionary<string, HashSet<ClipWeight>> ReplacedClips = new Dictionary<string, HashSet<ClipWeight>>();
+        public Dictionary<string, string> soundPacks = [];
+        public static Dictionary<string, HashSet<ClipWeight>> ReplacedClips = [];
 
         private Harmony harmony;
 
-        private void Awake()
+        internal void Awake()
         {
             if (Instance != null) return;
 
@@ -44,42 +44,30 @@ namespace RandomSounds
             harmony.PatchAll();
 
             CreateCustomSoundsFolder();
-
-            LC_API.ServerAPI.Networking.GetString += GetSeedSync;
+            Start();
         }
 
-        private void GetSeedSync(string data, string signature)
+        internal static void SetSeedSync(int seed, int offset)
         {
-            if (signature != SeedRPCSignature) return;
-
-            string[] seedData = data.Split("_");
-            try
+            // sync seed
+            if (seed != Seed || offset != SeedOffset)
             {
-                int seed = int.Parse(seedData[0]);
-                int seedOffset = int.Parse(seedData[1]);
-                // sync seed
-                if (seed != Seed || seedOffset != SeedOffset)
-                {
-                    logger.LogInfo($"Received seed {seed} & offset {seedOffset} from host.");
-                    Seed = seed;
-                    SeedOffset = seedOffset;
-                    random = new System.Random(Seed);
-                    for (int i = 0; i < SeedOffset; i++) { random.Next(); }
-                }
-            }
-            catch (Exception e)
-            {
-                logger.LogWarning($"Failed to parse seed data\n{e}");
+                Instance.logger.LogInfo($"Received seed {seed} & offset {offset} from host.");
+                Seed = seed;
+                SeedOffset = offset;
+                random = new System.Random(Seed);
+                for (int i = 0; i < SeedOffset; i++) { random.Next(); }
             }
         }
 
-        private void Start()
+        internal void Start()
         {
             LoadSounds();
 
             GameObject go = new("RCPSPlayerJoin");
             go.AddComponent<RCPSPlayerJoin>();
             DontDestroyOnLoad(go);
+            logger.LogDebug($"Added RCPSPlayerJoin");
         }
 
         private void CreateCustomSoundsFolder()
@@ -118,7 +106,7 @@ namespace RandomSounds
             string weightsPath = Path.Combine(audioPath, "weights.json");
 
             // Load sounds weights
-            SoundWeight[] soundsWeights = new SoundWeight[0];
+            SoundWeight[] soundsWeights = [];
             int totalWeight = files.Length;
             if (File.Exists(weightsPath))
             {
@@ -180,7 +168,7 @@ namespace RandomSounds
             }
             else
             {
-                ReplacedClips.Add(originalName, new() { new ClipWeight(newClip, weight) });
+                ReplacedClips.Add(originalName, [new ClipWeight(newClip, weight)]);
             }
         }
 
@@ -193,7 +181,7 @@ namespace RandomSounds
             }
             else
             {
-                ReplacedClips.Add(audioName, new() { new ClipWeight(null, weight) });
+                ReplacedClips.Add(audioName, [new ClipWeight(null, weight)]);
             }
         }
 

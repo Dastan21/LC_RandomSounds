@@ -11,15 +11,9 @@ namespace RandomSounds
     }
 
     [Serializable]
-    public struct ClipWeight
+    public struct ClipWeight(AudioClip clip, int weight)
     {
-        public AudioClip clip;
-        public int weight;
-
-        public ClipWeight(AudioClip clip, int weight)
-        {
-            this.clip = clip;
-            this.weight = weight;
-        }
+        public AudioClip clip = clip;
+        public int weight = weight;
     }
 }

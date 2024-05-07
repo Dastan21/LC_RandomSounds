@@ -12,8 +12,10 @@ namespace RandomSounds
 
         public void Update()
         {
+            RandomSounds.Instance.logger.LogInfo($"GameNetworkManager.Instance: {GameNetworkManager.Instance}");
             if (GameNetworkManager.Instance != null)
             {
+                RandomSounds.Instance.logger.LogInfo($"playerCount: {playerCount}, connected: {GameNetworkManager.Instance.connectedPlayers}");
                 if (playerCount < GameNetworkManager.Instance.connectedPlayers)
                 {
                     lobbyCheckTimer = 4.5f;
@@ -35,10 +37,11 @@ namespace RandomSounds
 
         private static void SyncSeed()
         {
+            RandomSounds.Instance.logger.LogInfo($"SyncSeed");
             if (HUDManager.Instance == null || !HUDManager.Instance.IsServer) return;
 
             RandomSounds.Instance.logger.LogInfo($"Broadcasting seed {RandomSounds.Seed} & offset {RandomSounds.SeedOffset} to other players.");
-            LC_API.ServerAPI.Networking.Broadcast(RandomSounds.Seed + "_" + RandomSounds.SeedOffset, RandomSounds.SeedRPCSignature);
+            NetworkHandler.Instance.SendSeedSyncServerRpc(RandomSounds.Seed, RandomSounds.SeedOffset);
         }
     }
 }
