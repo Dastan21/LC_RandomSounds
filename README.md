@@ -9,7 +9,7 @@ All of the sounds of a specific audio are randomly choosen and played synchronou
 
 OR
 
-1. Make sure you have [BepInEx](https://thunderstore.io/c/lethal-company/p/BepInEx/BepInExPack/) & [LCSoundTool](https://thunderstore.io/c/lethal-company/p/no00ob/LCSoundTool/) installed.
+1. Make sure you have [BepInEx](https://thunderstore.io/c/lethal-company/p/BepInEx/BepInExPack/) & [LC_API_V50](https://thunderstore.io/c/lethal-company/p/DrFeederino/LC_API_V50/) installed.
 2. Move `RandomSounds.dll` and `RandomSounds` into `...\Lethal Company\BepInEx\plugins`.
 
 ## Add sounds
@@ -43,6 +43,3 @@ Here is an example of `weights.json`:
 	}
 ]
 ```
-
-## Tip
-You can use [LCSoundTool](https://thunderstore.io/c/lethal-company/p/no00ob/LCSoundTool/) and its F5 logging feature to identify the name of the audio you want to replace.

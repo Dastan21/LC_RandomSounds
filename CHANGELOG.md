@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.3.0
+
+Fix for v50
+
 ## v1.2.0
 
 Fixed some audio sources not being replaced.
