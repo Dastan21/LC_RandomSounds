@@ -57,19 +57,25 @@ namespace RandomSounds.Patches
 
             if (!RandomSounds.ReplacedClips.ContainsKey(clipName)) return original;
 
-            ClipWeight[] clips = RandomSounds.ReplacedClips[clipName].ToArray();
+            ClipWeight[] clips = [.. RandomSounds.ReplacedClips[clipName]];
             int totalWeight = clips.Aggregate(0, (t, sw) => t + sw.weight);
 
             AudioClip clip = null;
-            int rng = RandomSounds.random.Next(0, totalWeight);
+            int rng = RandomSounds.Random.Next(0, totalWeight);
             RandomSounds.SeedOffset++;
+
             for (int i = 0; i < clips.Length + 1; i++)
             {
                 clip = clips[i].clip;
                 if (rng < clips[i].weight) break;
                 rng -= clips[i].weight;
             }
-            if (clip == null) return original;
+
+            if (clip == null)
+            {
+                RandomSounds.Instance.logger.LogInfo($"Playing default sound {clipName}");
+                return original;
+            }
 
             RandomSounds.Instance.logger.LogInfo($"Playing custom sound {clip.GetName()} instead of {clipName}");
             return clip;

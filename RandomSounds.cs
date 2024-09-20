@@ -11,114 +11,82 @@ using UnityEngine.Networking;
 
 namespace RandomSounds
 {
-    [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
+    [BepInPlugin("RandomSounds", "RandomSounds", "1.4.0")]
     public class RandomSounds : BaseUnityPlugin
     {
-        public const string RandomSoundsDir = "RandomSounds";
-        public const string SeedRPCSignature = "RCPS_SeedSync";
         public const string OriginalKey = "original";
-        public static readonly string[] AllowedExtensions = { ".wav", ".mp3", ".ogg" };
+        public static readonly string[] AllowedExtensions = [".wav", ".mp3", ".ogg"];
 
         public static RandomSounds Instance;
         public static int Seed = new System.Random().Next();
         public static int SeedOffset = 0;
-        public static System.Random random = new System.Random(Seed);
+        public static System.Random Random = new(Seed);
+        public string RandomSoundsFolderPath { get => Path.Combine(Paths.PluginPath, "RandomSounds"); }
+        public string RandomSoundsFolderLegacyPath { get => Path.Combine(Path.GetDirectoryName(Info.Location), "RandomSounds"); }
 
         internal ManualLogSource logger;
 
-        public Dictionary<string, string> soundPacks = new Dictionary<string, string>();
-        public static Dictionary<string, HashSet<ClipWeight>> ReplacedClips = new Dictionary<string, HashSet<ClipWeight>>();
+        public Dictionary<string, string> soundPacks = [];
+        public static Dictionary<string, HashSet<ClipWeight>> ReplacedClips = [];
 
         private Harmony harmony;
 
-        private void Awake()
+        internal void Awake()
         {
             if (Instance != null) return;
 
             Instance = this;
 
-            logger = BepInEx.Logging.Logger.CreateLogSource(MyPluginInfo.PLUGIN_GUID);
-            logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
-
-            harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
-            harmony.PatchAll();
-
-            CreateCustomSoundsFolder();
-
-            LC_API.ServerAPI.Networking.GetString += GetSeedSync;
-        }
-
-        private void GetSeedSync(string data, string signature)
-        {
-            if (signature != SeedRPCSignature) return;
-
-            string[] seedData = data.Split("_");
             try
             {
-                int seed = int.Parse(seedData[0]);
-                int seedOffset = int.Parse(seedData[1]);
-                // sync seed
-                if (seed != Seed || seedOffset != SeedOffset)
-                {
-                    logger.LogInfo($"Received seed {seed} & offset {seedOffset} from host.");
-                    Seed = seed;
-                    SeedOffset = seedOffset;
-                    random = new System.Random(Seed);
-                    for (int i = 0; i < SeedOffset; i++) { random.Next(); }
-                }
+                logger = BepInEx.Logging.Logger.CreateLogSource(MyPluginInfo.PLUGIN_GUID);
+                logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
+
+                harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
+                harmony.PatchAll();
+
+                // Create RandomSounds folder
+                Directory.CreateDirectory(RandomSoundsFolderPath);
+
+                LoadSounds();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                logger.LogWarning($"Failed to parse seed data\n{e}");
+                Debug.LogError(ex.ToString());
             }
         }
 
-        private void Start()
+        private void LoadSounds()
         {
-            LoadSounds();
-
-            GameObject go = new("RCPSPlayerJoin");
-            go.AddComponent<RCPSPlayerJoin>();
-            DontDestroyOnLoad(go);
-        }
-
-        private void CreateCustomSoundsFolder()
-        {
-            string path = Path.Combine(Path.GetDirectoryName(Info.Location), RandomSoundsDir);
-            Directory.CreateDirectory(path);
-        }
-
-        public void LoadSounds()
-        {
-            string directoryName = Path.GetDirectoryName(Info.Location);
-            string baseDir = Path.Combine(directoryName, RandomSoundsDir);
-            if (Directory.Exists(baseDir))
+            string soundsFolder = Directory.Exists(RandomSoundsFolderLegacyPath) ? RandomSoundsFolderLegacyPath : RandomSoundsFolderPath;
+            if (Directory.Exists(soundsFolder))
             {
-                string[] directories = Directory.GetDirectories(baseDir);
+                string[] directories = Directory.GetDirectories(soundsFolder);
                 foreach (string dir in directories)
                 {
                     ProcessSoundFiles(dir);
                 }
+                logger.LogInfo($"All sounds have been loaded!");
             }
             else
             {
-                logger.LogInfo($"{RandomSoundsDir} folder not found.");
+                logger.LogInfo($"RandomSounds folder not found.");
             }
         }
 
-        private void ProcessSoundFiles(string audioPath)
+        private void ProcessSoundFiles(string audiosDirPath)
         {
             string[] files = Directory
-                .GetFiles(audioPath)
+                .GetFiles(audiosDirPath)
                 .Where(file => AllowedExtensions.Any(file.ToLower().EndsWith))
                 .ToArray();
             if (files.Length <= 0) return;
 
-            string audioName = Path.GetFileName(audioPath);
-            string weightsPath = Path.Combine(audioPath, "weights.json");
+            string audioName = Path.GetFileName(audiosDirPath);
+            string weightsPath = Path.Combine(audiosDirPath, "weights.json");
 
             // Load sounds weights
-            SoundWeight[] soundsWeights = new SoundWeight[0];
+            SoundWeight[] soundsWeights = [];
             int totalWeight = files.Length;
             if (File.Exists(weightsPath))
             {
@@ -180,7 +148,7 @@ namespace RandomSounds
             }
             else
             {
-                ReplacedClips.Add(originalName, new() { new ClipWeight(newClip, weight) });
+                ReplacedClips.Add(originalName, [new ClipWeight(newClip, weight)]);
             }
         }
 
@@ -193,7 +161,7 @@ namespace RandomSounds
             }
             else
             {
-                ReplacedClips.Add(audioName, new() { new ClipWeight(null, weight) });
+                ReplacedClips.Add(audioName, [new ClipWeight(null, weight)]);
             }
         }
 
@@ -237,6 +205,12 @@ namespace RandomSounds
             }
 
             return clip;
+        }
+
+        public static void SyncRandom()
+        {
+            Random = new System.Random(Seed);
+            for (int i = 0; i < SeedOffset; i++) { Random.Next(); }
         }
     }
 }

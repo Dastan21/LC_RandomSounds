@@ -9,7 +9,7 @@ All of the sounds of a specific audio are randomly choosen and played synchronou
 
 OR
 
-1. Make sure you have [BepInEx](https://thunderstore.io/c/lethal-company/p/BepInEx/BepInExPack/) & [LC_API_V50](https://thunderstore.io/c/lethal-company/p/DrFeederino/LC_API_V50/) installed.
+1. Make sure you have [BepInEx](https://thunderstore.io/c/lethal-company/p/BepInEx/BepInExPack/) installed.
 2. Move `RandomSounds.dll` and `RandomSounds` into `...\Lethal Company\BepInEx\plugins`.
 
 ## Add sounds
